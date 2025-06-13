@@ -20,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 import static com.darkharsus.walletservice.constants.Constants.INSUFFICIENT_FUNDS;
-import static com.darkharsus.walletservice.constants.Constants.INVALID_OPERATION_TYPE;
-import static com.darkharsus.walletservice.constants.Constants.INVALID_OPERATION_TYPE_NULL;
 import static com.darkharsus.walletservice.constants.Constants.WALLET_NOT_FOUND;
 
 @Service
@@ -48,10 +46,6 @@ public class WalletServiceImpl implements WalletService {
         Wallet wallet = walletRepository.findByIdWithLock(request.getWalletId())
                 .orElseThrow(() -> new WalletException(WALLET_NOT_FOUND + request.getWalletId()));
 
-        if (request.getOperationType() == null) {
-            throw new WalletException(INVALID_OPERATION_TYPE_NULL);
-        }
-
         switch (request.getOperationType()) {
             case DEPOSIT:
                 wallet.setBalance(wallet.getBalance() + request.getAmount());
@@ -62,8 +56,6 @@ public class WalletServiceImpl implements WalletService {
                 }
                 wallet.setBalance(wallet.getBalance() - request.getAmount());
                 break;
-            default:
-                throw new WalletException(INVALID_OPERATION_TYPE + request.getOperationType());
         }
         walletRepository.save(wallet);
         log.debug("Операция завершена для walletId: {}, new balance: {}",

@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.darkharsus.walletservice.constants.Constants.INSUFFICIENT_FUNDS;
-import static com.darkharsus.walletservice.constants.Constants.INVALID_OPERATION_TYPE_NULL;
 import static com.darkharsus.walletservice.constants.Constants.WALLET_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -98,17 +97,6 @@ class WalletServiceImplTest {
 
         WalletException exception = assertThrows(WalletException.class, () -> walletService.performOperation(request));
         assertEquals(INSUFFICIENT_FUNDS + walletId, exception.getMessage());
-        verify(walletRepository, times(1)).findByIdWithLock(walletId);
-        verify(walletRepository, never()).save(any());
-    }
-
-    @Test
-    void testPerformOperation_NullOperationType() {
-        request.setOperationType(null);
-        when(walletRepository.findByIdWithLock(walletId)).thenReturn(Optional.of(wallet));
-
-        WalletException exception = assertThrows(WalletException.class, () -> walletService.performOperation(request));
-        assertEquals(INVALID_OPERATION_TYPE_NULL, exception.getMessage());
         verify(walletRepository, times(1)).findByIdWithLock(walletId);
         verify(walletRepository, never()).save(any());
     }
